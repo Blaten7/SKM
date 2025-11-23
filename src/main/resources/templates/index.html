@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <link rel="icon" type="image/x-icon" href="/header/SKM%20Logo.png">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <meta charset="UTF-8">
+    <title>SKM</title>
+</head>
+<style>
+    .swiperImg {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+    section {
+        min-height: 125vh;
+    }
+</style>
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+<!-- Swiper Container -->
+<div class="swiper" style="width: 100%; height: 70vh;">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide">
+            <img class="swiperImg" src="/swiperSpotImage/Geek+/1.png" alt="">
+        </div>
+        <div class="swiper-slide">
+            <img class="swiperImg" src="/swiperSpotImage/Geek+/2.jpg" alt="">
+        </div>
+        <div class="swiper-slide">
+            <img class="swiperImg" src="/swiperSpotImage/Geek+/3.jpg" alt="">
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+
+    <!-- Pagination -->
+    <div class="swiper-pagination"></div>
+</div>
+
+<section>
+
+</section>
+
+
+<div th:replace="~{layout/footer :: footer}"></div>
+<script>
+    const swiper = new Swiper('.swiper', {
+        loop: true,
+        effect: 'fade',    // 'fade', 'cube', 'coverflow' 등 다른 효과도 가능
+        fadeEffect: {
+          crossFade: true
+        },
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev'
+        }
+    });
+</script>
+
+</body>
+</html>

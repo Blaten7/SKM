@@ -1,0 +1,36 @@
+<header th:fragment="header"
+        style="width: 100vw; height: 15vh;" xmlns="">
+
+    <div style="
+        height: 100%;
+        display: flex;
+        align-items: center;
+        overflow: hidden;">
+
+        <div style="width: 20%"><!--좌측여백--></div>
+<!--        <img src="/SKM%20Main%20-%201.jpeg"-->
+        <img src="/header/SKM_Main1_Slice-removebg-preview.png"
+             style="
+                height: 30%;
+                width: auto;
+                object-fit: cover;
+             " alt="">
+        <div style="width: 5%"><!--중간여백--></div>
+        <a class="menuBtn" href="">로봇 관리</a>
+        <a class="menuBtn" href="/system">시스템 운영</a>
+        <a class="menuBtn" href="">현장 정보</a>
+        <a class="menuBtn" href="">게시판</a>
+        <a class="menuBtn" href="">자료실</a>
+        <a class="menuBtn" href="">실시간</a>
+
+        <div style="width: 20%"><!--좌측여백--></div>
+    </div>
+
+    <style>
+        .menuBtn {
+            margin-left: 2vw;
+            text-decoration: none;
+        }
+    </style>
+</header>
+
