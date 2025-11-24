@@ -1,36 +1,146 @@
-<header th:fragment="header"
-        style="width: 100vw; height: 15vh;" xmlns="">
+<header th:fragment="header" style="width: 100vw; height: 15vh;">
 
-    <div style="
-        height: 100%;
-        display: flex;
-        align-items: center;
-        overflow: hidden;">
+    <div class="headerWrap">
 
-        <div style="width: 20%"><!--좌측여백--></div>
-<!--        <img src="/SKM%20Main%20-%201.jpeg"-->
-        <img src="/header/SKM_Main1_Slice-removebg-preview.png"
-             style="
-                height: 30%;
-                width: auto;
-                object-fit: cover;
-             " alt="">
-        <div style="width: 5%"><!--중간여백--></div>
-        <a class="menuBtn" href="">로봇 관리</a>
-        <a class="menuBtn" href="/system">시스템 운영</a>
-        <a class="menuBtn" href="">현장 정보</a>
-        <a class="menuBtn" href="">게시판</a>
-        <a class="menuBtn" href="">자료실</a>
-        <a class="menuBtn" href="">실시간</a>
+        <!-- 왼쪽 로고 -->
+        <div class="logoWrap">
+            <img src="/header/SKM_Main1_Slice-removebg-preview.png"
+                 class="logoImg" alt="logo">
+        </div>
 
-        <div style="width: 20%"><!--좌측여백--></div>
+        <!-- 가운데 메뉴 -->
+        <nav class="menuWrap">
+            <a class="menuBtn" href="">로봇 관리</a>
+            <a class="menuBtn" href="/system">시스템 운영</a>
+            <a class="menuBtn" href="">현장 정보</a>
+            <a class="menuBtn" href="">게시판</a>
+            <a class="menuBtn" href="">자료실</a>
+            <a class="menuBtn" href="">실시간</a>
+        </nav>
+
+        <!-- 오른쪽 아이콘 -->
+        <div class="iconWrap">
+            <img class="SVG_Icon" name="SVG_User_Icon" src="/header/SVG_UserIcon.svg" alt="user">
+            <div class="UserMenu">
+                <a href="" class="UserMenuBtn">로그인/회원가입</a>
+<!--                <a href="" class="UserMenuBtn"></a>-->
+<!--                <a href="" class="UserMenuBtn"></a>-->
+
+            </div>
+        </div>
+
     </div>
 
+
     <style>
-        .menuBtn {
-            margin-left: 2vw;
-            text-decoration: none;
+        /*헤더 스타일*/
+        .headerWrap {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5vw;
+            white-space: nowrap;
+            overflow: hidden;
         }
+
+        .logoWrap {
+            display: flex;
+            align-items: center;
+        }
+
+        .logoImg {
+            height: 35%;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .UserMenu {
+            position: absolute;
+            top: 1.8em;
+            left: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 0.5rem 0;
+            display: none;
+            min-width: 3vw;
+            white-space: nowrap;
+            z-index: 999;
+
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .UserMenu a {
+            display: block;
+            padding: 0.4rem 0;
+            text-decoration: none;
+
+        }
+
+        .UserMenu a:hover {
+            background: #f0f0f0;
+        }
+
+        .iconWrap:hover .UserMenu {
+            display: block;
+        }
+
+        .menuWrap {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .menuBtn {
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        .iconWrap {
+            display: inline-block;
+            align-items: center;
+            position: relative;
+            /*padding-bottom: 10px;*/
+        }
+        /* hover buffer 영역 생성 */
+        .iconWrap::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            height: 12px; /* hover 유지용 투명 공간 */
+            background: transparent;
+        }
+
+        .SVG_Icon {
+            width: 1.4em;
+            height: 1.4em;
+            aspect-ratio: 1/1;
+            cursor: pointer;
+        }
+
+        /*=====*/
+
+        /*뷰포트 관리*/
+
+            /* 화면이 너무 작아지면 메뉴 간격 줄이기 */
+        @media (max-width: 1250px) {
+            .menuWrap {
+                gap: 1.4rem;
+            }
+            .menuBtn {
+                font-size: 1rem;
+            }
+        }
+
+            /* 더 작아지면 메뉴 숨기고 아이콘만 보이게 할 준비 */
+        @media (max-width: 1000px) {
+            .menuWrap {
+                display: none;
+            }
+        }
+
+        /*=====*/
     </style>
 </header>
-
