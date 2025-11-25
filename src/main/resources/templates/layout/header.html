@@ -4,8 +4,10 @@
 
         <!-- 왼쪽 로고 -->
         <div class="logoWrap">
-            <img src="/header/SKM_Main1_Slice-removebg-preview.png"
-                 class="logoImg" alt="logo">
+
+            <a href="/"><img src="/header/SKM_Main1_Slice-removebg-preview.png"
+                 class="logoImg" alt="logo"></a>
+
         </div>
 
         <!-- 가운데 메뉴 -->
@@ -22,7 +24,7 @@
         <div class="iconWrap">
             <img class="SVG_Icon" name="SVG_User_Icon" src="/header/SVG_UserIcon.svg" alt="user">
             <div class="UserMenu">
-                <a href="" class="UserMenuBtn">로그인/회원가입</a>
+                <a href="/user/login" class="UserMenuBtn">로그인/회원가입</a>
 <!--                <a href="" class="UserMenuBtn"></a>-->
 <!--                <a href="" class="UserMenuBtn"></a>-->
 
@@ -31,15 +33,16 @@
 
     </div>
 
-
     <style>
         /*헤더 스타일*/
         .headerWrap {
             height: 100%;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 5vw;
+            justify-content: flex-start;
+            gap: 3rem;
+            padding: 1rem 5rem 3rem 5rem;
+            margin-left: 30rem;
             white-space: nowrap;
             overflow: hidden;
         }
@@ -50,9 +53,10 @@
         }
 
         .logoImg {
-            height: 35%;
+            height: 15%;
             width: auto;
             object-fit: contain;
+            cursor: pointer;
         }
 
         .UserMenu {
