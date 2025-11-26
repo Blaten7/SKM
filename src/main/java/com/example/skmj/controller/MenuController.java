@@ -9,4 +9,9 @@ public class MenuController {
     public String system() {
         return "system/systemMain";
     }
+
+    @GetMapping("/user/login")
+    public String login() {
+        return "user/login";
+    }
 }
