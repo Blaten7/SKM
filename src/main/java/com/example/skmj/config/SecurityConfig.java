@@ -30,18 +30,18 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/css/**", "/js/**",
+                        .requestMatchers("/",
                                 "/header/**", "/swiperSpotImage/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(Customizer.withDefaults());
 
-        http.formLogin(form -> form
+        http.formLogin(config -> config
                 .loginPage("/user/login")
-//                .loginProcessingUrl("/loginProcess")
+                .loginProcessingUrl("/user/loginProcess")
                 .defaultSuccessUrl("/", true)
-                .permitAll()
         );
+
 
         return http.build();
     }
