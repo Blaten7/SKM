@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Excel 기반 AutoLogin HTML 생성기</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        input[type="file"] {
+            margin-top: 8px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f5f5f5;
+        }
+
+        button {
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #555;
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        .error {
+            color: #c00;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<h1>Excel [Robot IP List] 기반 Port 5000, 9001 및 Firmware update autoamation HTML</h1>
+
+<div class="box">
+    <div>
+        <label for="excelFile">엑셀 파일 선택 (XLSX)</label><br>
+        <input type="file" id="excelFile" accept=".xlsx,.xlsm,.xlsb,.xls">
+    </div>
+    <div class="hint">
+        Robot IP List 엑셀파일을 기준으로 합니다.<br>
+        A열: 행번호 / B열: Robot Type / C열: Robot ID / D열: Robot IP<br>
+    </div>
+    <div class="hint">
+        생성되는 autologin.html은 다음 형식의 POST 요청을 사용합니다:<br>
+        action="http://IP:PORT/login" / 파라미터: username, password<br>
+        실제 로그인 엔드포인트와 파라미터 이름에 맞게 매개값을 수정하여 이용하세요.<br>
+
+        <label for="inputPort" style="display: inline-block; width: 60px;">PORT</label>
+        <input id="inputPort" type="text" placeholder="PORT ex)5000, 9001" value="5000"><br>
+
+        <label for="inputId" style="display: inline-block; width: 60px;">아이디</label>
+        <input id="inputId" type="text" value="geekplus_en"><br>
+
+        <label for="inputPw" style="display: inline-block; width: 60px;">비밀번호</label>
+        <input id="inputPw" type="text" value="geekplus_en">
+    </div>
+    <div id="errorBox" class="error"></div>
+</div>
+
+<div class="box">
+    <strong>엑셀 파싱 결과</strong>
+    <div id="resultArea" class="hint">엑셀 파일을 선택하면 여기에서 행별로 autologin.html 다운로드 버튼이 생성됩니다.</div>
+</div>
+
+<script>
+    const excelInput = document.getElementById("excelFile");
+    const resultArea = document.getElementById("resultArea");
+    const errorBox = document.getElementById("errorBox");
+
+
+    excelInput.addEventListener("change", function (event) {
+        errorBox.textContent = "";
+        resultArea.textContent = "처리 중...";
+
+        const file = event.target.files[0];
+        if (!file) {
+            resultArea.textContent = "엑셀 파일을 선택해 주세요.";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: "array"});
+
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const sheetData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                if (!sheetData || sheetData.length < 2) {
+                    resultArea.textContent = "데이터 행이 없습니다. (헤더 제외 최소 1행 이상 필요)";
+                    return;
+                }
+
+                // 첫 행은 헤더로 가정하고 건너뜀
+                const dataRows = sheetData.slice(1);
+                renderResultTable(dataRows);
+            } catch (err) {
+                console.error(err);
+                resultArea.textContent = "엑셀 파싱 중 오류가 발생했습니다.";
+                errorBox.textContent = String(err);
+            }
+        };
+
+        reader.onerror = function (e) {
+            console.error(e);
+            resultArea.textContent = "파일을 읽는 도중 오류가 발생했습니다.";
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+
+    function renderResultTable(rows) {
+        if (!rows || rows.length === 0) {
+            resultArea.textContent = "유효한 데이터가 없습니다.";
+            return;
+        }
+
+        const table = document.createElement("table");
+
+        const iid = document.getElementById("inputId");
+        const ipw = document.getElementById("inputPw");
+        const iport = document.getElementById("inputPort");
+
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        const headerCells = ["행 번호", "로봇타입", "로봇번호", "IP", "PORT", "ID", "PW", "생성"];
+        for (const text of headerCells) {
+            const th = document.createElement("th");
+            th.textContent = text;
+            headerRow.appendChild(th);
+        }
+        thead.appendChild(headerRow);
+
+        const tbody = document.createElement("tbody");
+
+        rows.forEach(function (row, index) {
+            const tr = document.createElement("tr");
+
+            //const label = row[0] ? String(row[0]).trim() : "";
+            const robotType = row[1] ? String(row[1]).trim() : "";
+            const robotNum = row[2] ? String(row[2]).trim() : "";
+            const ip = row[3] ? String(row[3]).trim() : "";
+            const port = iport.value.trim();
+            const userId = iid.value.trim();
+            const password = ipw.value.trim();
+
+            const rowIndexCell = document.createElement("td");
+            rowIndexCell.textContent = String(index + 1); // 엑셀 행 번호
+            tr.appendChild(rowIndexCell);
+
+            // const labelCell = document.createElement("td");
+            // labelCell.textContent = label;
+            // tr.appendChild(labelCell);
+
+            const robotTypeCell = document.createElement("td");
+            robotTypeCell.textContent = robotType;
+            tr.appendChild(robotTypeCell);
+
+            const robotNumCell = document.createElement("td");
+            robotNumCell.textContent = robotNum;
+            tr.appendChild(robotNumCell);
+
+            const ipCell = document.createElement("td");
+            ipCell.textContent = ip;
+            tr.appendChild(ipCell);
+
+            const portCell = document.createElement("td");
+            portCell.textContent = port;
+            tr.appendChild(portCell);
+
+            const idCell = document.createElement("td");
+            idCell.textContent = userId;
+            tr.appendChild(idCell);
+
+            const pwCell = document.createElement("td");
+            pwCell.textContent = password;
+            tr.appendChild(pwCell);
+
+            const actionCell = document.createElement("td");
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = "autologin.html 다운로드";
+
+            button.addEventListener("click", function () {
+                if (!ip || !port || !userId || !password) {
+                    alert("IP, 포트, ID, 비밀번호 중 빈 값이 있습니다. 해당 행을 확인하세요.");
+                    return;
+                }
+                const safeLabel = rowIndexCell || ("row" + String(index + 2));
+                generateAndDownloadAutoLoginHtml(robotType, robotNum, ip, port, userId, password);
+            });
+
+            actionCell.appendChild(button);
+            tr.appendChild(actionCell);
+
+            tbody.appendChild(tr);
+        });
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+
+        resultArea.innerHTML = "";
+        resultArea.appendChild(table);
+    }
+
+    function generateAndDownloadAutoLoginHtml(rowIndexCell, robotNum, ip, port, userId, password, robotType) {
+        const targetUrl = "http://" + ip + ":" + port + "/login";
+
+        console.log("Generate Function Enter");
+        // 실제 로그인 엔드포인트와 파라미터 이름(username, password)은 환경에 맞게 수정 필요
+        const htmlContent = [
+            "<!DOCTYPE html>",
+            "<html>",
+            "<body>",
+            "    <form id=\"autologin\" " +
+            "   action=\"" + escapeHtml(targetUrl) + "/" + "\"" +
+            "   method=\"post\" >",
+            "        <input type=\"hidden\" name=\"Username\" value=\"" + escapeHtml(userId) + "\">",
+            "        <input type=\"hidden\" name=\"Password\" value=\"" + escapeHtml(password) + "\">",
+            "    </form>",
+            "    <script>",
+            "        document.getElementById('autologin').submit();",
+            "    <\/script>",
+            "</body>",
+            "</html>"
+        ].join("\n");
+
+        const blob = new Blob([htmlContent], {type: "text/html;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = rowIndexCell.replace(/[^a-zA-Z0-9_\-가-힣]/g, "_") + "_" + robotNum + "_autologin.html";
+        // a.download = rowIndexCell.replace(/[^a-zA-Z0-9_\-가-힣]/g, "_") + "_autologin.html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(str) {
+        const map = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "\"": "&quot;",
+            "'": "&#39;"
+        };
+        return String(str).replace(/[&<>"']/g, function (m) {
+            return map[m];
+        });
+    }
+</script>
+</body>
+</html>
